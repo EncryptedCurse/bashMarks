@@ -18,5 +18,6 @@ A file named `.bmarks` will be created in your home directory. The name and path
 |`jump <name>`|`j`|jump to a bookmark|
 |`del  <name>`|`d`|delete a bookmark|
 |`list`|`l`|list all bookmarks|
+|`rename`|`r`|rename a bookmark|
 
 By default, aliases are enabled for easier use. These may be modified or removed entirely at the end of the script.

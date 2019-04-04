@@ -67,13 +67,36 @@ function del {
     fi
 }
 
+function rename {
+	__help $1
+	MARK=$(grep "^$1|" $FILE)
+	if [[ -z $1 ]]; then
+		echo -e "${RED}no bookmark name provided${RESET}"
+	elif [[ -z $2 ]]; then
+		echo -e "${RED}no new bookmark name provided${RESET}"
+	elif [[ -z $MARK ]]; then
+		echo -e "${RED}bookmark \"$1\" does not exist${RESET}"
+	fi
+
+	DIR=$(echo $MARK | cut -d\| -f2)
+	CURDIR=$(pwd)
+	del $1 &> /dev/null &&
+
+	cd $DIR
+	save &> /dev/null $2
+	cd $CURDIR
+
+	echo -e "${GREEN}bookmark \"$1\" renamed to \"$2\"${RESET}"
+}
+
 function __help {
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
         echo -e "${BLUE}────────────── bashMarks ──────────────${RESET}
-save ${GRAY}<name>${RESET}     save current directory
-jump ${GRAY}<name>${RESET}     jump to a bookmark
-del  ${GRAY}<name>${RESET}     delete a bookmark
-list            list all bookmarks"
+save ${GRAY}<name>${RESET}                    save current directory
+jump ${GRAY}<name>${RESET}                    jump to a bookmark
+del  ${GRAY}<name>${RESET}                    delete a bookmark
+list                           list all bookmarks
+rename ${GRAY}<oldname> <newname>${RESET}     rename a bookmark"
         kill -INT $$
     fi
 }
@@ -82,3 +105,4 @@ alias s='save'
 alias j='jump'
 alias d='del'
 alias l='list'
+alias r='rename'
