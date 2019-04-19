@@ -17,17 +17,19 @@ function save {
     if [[ -z $1 ]]; then
         echo -e "${RED}no bookmark name provided${RESET}"
     else
-        if grep -q "^$1|" $FILE; then
-            echo -ne "${RED}bookmark \"$1\" already exists, overwrite?${RESET} "
-            read REPLY
-            if [[ "${REPLY,,}" == "yes" || "${REPLY,,}" == "y" ]]; then
-                del $1 &> /dev/null
+        if [[ -n $2 ]]; then
+            if [[ -d $2 ]]; then
+                __overwrite $1
+                echo "$1|$2" >> $FILE
+                echo -e "${GREEN}bookmark for $2 saved as \"$1\"${RESET}"
             else
-                kill -INT $$
+                echo -e "${RED}directory \"$2\" does not exist${RESET}"
             fi
+        else
+            __overwrite $1
+            echo "$1|$PWD" >> $FILE
+            echo -e "${GREEN}bookmark for $PWD saved as \"$1\"${RESET}"
         fi
-        echo "$1|$PWD" >> $FILE
-        echo -e "${GREEN}bookmark for $PWD saved as \"$1\"${RESET}"
     fi
 }
 
@@ -99,13 +101,25 @@ function list {
 function __help {
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
         echo -e "${BLUE}───────────────── bashMarks ─────────────────${RESET}
-save ${GRAY}<name>${RESET}        save current directory
-jump ${GRAY}<name>${RESET}        go to bookmark
-back               go to last directory
-del  ${GRAY}<name>${RESET}        delete bookmark
-ren  ${GRAY}<old> <new>${RESET}   rename bookmark
-list               list all bookmarks"
+save ${GRAY}<name> [dir]${RESET}   save current directory
+jump ${GRAY}<name>${RESET}         go to bookmark
+back                go to last directory
+del  ${GRAY}<name>${RESET}         delete bookmark
+ren  ${GRAY}<old> <new>${RESET}    rename bookmark
+list                list all bookmarks"
         kill -INT $$
+    fi
+}
+
+function __overwrite {
+    if grep -q "^$1|" $FILE; then
+        echo -ne "${RED}bookmark \"$1\" already exists, overwrite?${RESET} "
+        read REPLY
+        if [[ "${REPLY,,}" == "yes" || "${REPLY,,}" == "y" ]]; then
+            del $1 &> /dev/null
+        else
+            kill -INT $$
+        fi
     fi
 }
 

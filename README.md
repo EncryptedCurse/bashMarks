@@ -14,7 +14,7 @@ A file named `.bmarks` will be created in your home directory. The name and path
 
 | command | alias | description |
 |---------|-------|-------------|
-|`save <name>`|`s`|save current directory|
+|`save <name> [dir]`|`s`|save current directory|
 |`jump <name>`|`j`|go to bookmark|
 |`back`|`b`|go to last directory|
 |`del <name>`|`d`|delete bookmark|
