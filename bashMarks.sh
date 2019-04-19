@@ -1,5 +1,4 @@
 #!/bin/bash
-
 FILE=~/.bmarks
 
 GRAY='\e[1;30m'
@@ -41,15 +40,27 @@ function jump {
         if [[ -z $MARK ]]; then
             echo -e "${RED}bookmark \"$1\" does not exist${RESET}"
         else
-            cd $(echo "$MARK|" | cut -d\| -f2)
+            export __LAST=$PWD
+            cd $(echo "$MARK" | cut -d\| -f2)
         fi
+    fi
+}
+
+function back {
+    __help $1
+    if [[ -z $__LAST ]]; then
+        echo -e "${RED}no directory to jump back to${RESET}"
+    else
+        cd $__LAST
     fi
 }
 
 function del {
     __help $1
     MARK=$(grep "^$1|" $FILE)
-    if [[ -z $MARK ]]; then
+    if [[ -z $1 ]]; then
+        echo -e "${RED}no bookmark name provided${RESET}"
+    elif [[ -z $MARK ]]; then
         echo -e "${RED}bookmark \"$1\" does not exist${RESET}"
     else
         \grep -v "^$1|" $FILE > $FILE.tmp
@@ -60,13 +71,16 @@ function del {
 
 function ren {
     __help $1
-    MARK=$(grep "^$1|" $FILE)
+    OLD_MARK=$(grep "^$1|" $FILE)
+    NEW_MARK=$(grep "^$2|" $FILE)
     if [[ -z $1 ]]; then
         echo -e "${RED}no bookmark name provided${RESET}"
     elif [[ -z $2 ]]; then
         echo -e "${RED}you did not specify a new bookmark name${RESET}"
-    elif [[ -z $MARK ]]; then
+    elif [[ -z $OLD_MARK ]]; then
         echo -e "${RED}bookmark \"$1\" does not exist${RESET}"
+    elif [[ -n $NEW_MARK ]]; then
+        echo -e "${RED}boomark \"$2\" already exists${RESET}"
     else
          sed -i "s|^$1\||$2\||g" $FILE
          echo -e "${GREEN}renamed \"$1\" to \"$2\"${RESET}"
@@ -84,9 +98,10 @@ function list {
 
 function __help {
     if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-        echo -e "${BLUE}─────────────── bashMarks ───────────────${RESET}
+        echo -e "${BLUE}───────────────── bashMarks ─────────────────${RESET}
 save ${GRAY}<name>${RESET}        save current directory
-jump ${GRAY}<name>${RESET}        open bookmark
+jump ${GRAY}<name>${RESET}        go to bookmark
+back               go to last directory
 del  ${GRAY}<name>${RESET}        delete bookmark
 ren  ${GRAY}<old> <new>${RESET}   rename bookmark
 list               list all bookmarks"
@@ -96,6 +111,7 @@ list               list all bookmarks"
 
 alias s='save'
 alias j='jump'
+alias b='back'
 alias d='del'
 alias r='ren'
 alias l='list'
