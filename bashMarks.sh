@@ -96,7 +96,14 @@ function ren {
 
 function list {
     __help $1
-    if [[ -s $FILE ]]; then
+    local MARK=$(grep "^$1|" $FILE)
+    if [[ -n $1 ]]; then
+        if [[ -n $MARK ]]; then
+            echo "$MARK" | cut -d\| -f2
+        else
+            echo -e "${RED}bookmark \"$1\" does not exist${RESET}"
+        fi
+    elif [[ -s $FILE ]]; then
         cat $FILE | sort | awk '{ printf "\033[1;34m%-18s\033[0m %s\n", $1, $2}' FS=\|
     else
         echo -e "${YELLOW}no bookmarks saved${RESET}"
@@ -111,7 +118,7 @@ jump ${GRAY}<name>${RESET}         go to bookmark
 back                go to last directory
 del  ${GRAY}<name>${RESET}         delete bookmark
 ren  ${GRAY}<old> <new>${RESET}    rename bookmark
-list                list all bookmarks"
+list ${GRAY}[name]${RESET}         list all bookmarks"
         kill -INT $$
     fi
 }
@@ -137,6 +144,8 @@ function __autocomp {
 complete -F __autocomp jump
 complete -F __autocomp del
 complete -F __autocomp ren
+complete -F __autocomp list
 complete -F __autocomp j
 complete -F __autocomp d
 complete -F __autocomp r
+complete -F __autocomp l

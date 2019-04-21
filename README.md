@@ -10,7 +10,7 @@ A shell script that allows you to bookmark and jump to commonly used directories
  4. Add the following line to `.bashrc`: `source ~/.local/bin/bashMarks.sh`
 
 ## Usage
-A file named `.bmarks` will be created in your home directory. The name and path of your bookmark storage may be changed through the `FILE` variable.
+A file named **.bmarks** will be created in your home directory. The name and path of your bookmark storage may be changed through the `FILE` variable.
 
 | command | alias | description |
 |---------|-------|-------------|
@@ -19,8 +19,11 @@ A file named `.bmarks` will be created in your home directory. The name and path
 |`back`|`b`|go to last directory|
 |`del <name>`|`d`|delete bookmark|
 |`ren <old> <new>`|`r`|rename bookmark|
-|`list`|`l`|list all bookmarks|
+|`list [name]`|`l`|list all bookmarks|
+
+<sup>also accessible using the `--help` or `-h` flag</sup> 
 
 * By default, aliases are enabled for easier use; these may be modified or removed entirely.
 * `save` can take an optional second parameter to bookmark directories outside of the current one.   
-* `save`, `jump`, and `ren` support tab completion.
+* `list` can take an optinal parameter to display a particular bookmark's associated directory.
+* `save`, `jump`, `ren`, and `list` support tab completion.
