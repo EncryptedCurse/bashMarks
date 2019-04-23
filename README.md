@@ -17,7 +17,7 @@ A file named **.bmarks** will be created in your home directory. The name and pa
 |`save <name> [dir]`|`s`|save current directory|
 |`jump <name>`|`j`|go to bookmark|
 |`back`|`b`|go to last directory|
-|`del <name>`|`d`|delete bookmark|
+|`del [name]`|`d`|delete bookmark|
 |`ren <old> <new>`|`r`|rename bookmark|
 |`list [name]`|`l`|list all bookmarks|
 
@@ -25,5 +25,6 @@ A file named **.bmarks** will be created in your home directory. The name and pa
 
 * By default, aliases are enabled for easier use; these may be modified or removed entirely.
 * `save` can take an optional second parameter to bookmark directories outside of the current one.   
+* `del` without any parameter will purge all bookmarks that point to nonexistent directories.
 * `list` can take an optinal parameter to display a particular bookmark's associated directory.
 * `save`, `jump`, `ren`, and `list` support tab completion.

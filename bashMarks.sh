@@ -64,7 +64,24 @@ function del {
     __help $1
     local MARK=$(grep "^$1|" $FILE)
     if [[ -z $1 ]]; then
-        echo -e "${RED}no bookmark name provided${RESET}"
+        echo -ne "${YELLOW}this will delete bookmarks to nonexistent directories, continue?${RESET} "
+        local REPLY; read REPLY
+        if [[ "${REPLY,,}" == "yes" || "${REPLY,,}" == "y" ]]; then
+            local COUNT=0
+            while read LINE; do
+                local NAME=$(echo "$LINE" | cut -d\| -f1)
+                local DIR=$(echo "$LINE" | cut -d\| -f2)
+                if [[ ! -d $DIR ]]; then
+                    \grep -v "$LINE" $FILE > $FILE.tmp
+                    \mv $FILE.tmp $FILE
+                    COUNT=$((COUNT + 1))
+                    echo -e "${GRAY}> $NAME ($DIR)${RESET}"
+                fi
+            done < $FILE
+            echo -e "${GREEN}deleted $COUNT broken bookmark(s)${RESET}"
+        else
+            kill -INT $$
+        fi
     elif [[ -z $MARK ]]; then
         echo -e "${RED}bookmark \"$1\" does not exist${RESET}"
     else
@@ -116,7 +133,7 @@ function __help {
 save ${GRAY}<name> [dir]${RESET}   save current directory
 jump ${GRAY}<name>${RESET}         go to bookmark
 back                go to last directory
-del  ${GRAY}<name>${RESET}         delete bookmark
+del  ${GRAY}[name]${RESET}         delete bookmark
 ren  ${GRAY}<old> <new>${RESET}    rename bookmark
 list ${GRAY}[name]${RESET}         list all bookmarks"
         kill -INT $$
