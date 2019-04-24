@@ -10,7 +10,7 @@ A shell script that allows you to bookmark and jump to commonly used directories
  4. Add the following line to `.bashrc`: `source ~/.local/bin/bashMarks.sh`
 
 ## Usage
-A file named **.bmarks** will be created in your home directory. The name and path of your bookmark storage may be changed through the `FILE` variable.
+A file named **.bmarks** will be created in your home directory. The name and path of your bookmark storage may be changed through the `BOOKMARKS_FILE` variable.
 
 | command | alias | description |
 |---------|-------|-------------|

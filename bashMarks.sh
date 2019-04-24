@@ -1,5 +1,5 @@
 #!/bin/bash
-FILE=~/.bmarks
+BOOKMARKS_FILE=~/.bmarks
 
 alias s='save'
 alias j='jump'
@@ -15,8 +15,8 @@ YELLOW='\e[1;33m'
 BLUE='\e[1;34m'
 RESET='\e[0m'
 
-if [[ ! -f $FILE ]]; then
-    touch $FILE
+if [[ ! -f $BOOKMARKS_FILE ]]; then
+    touch $BOOKMARKS_FILE
 fi
 
 function save {
@@ -26,21 +26,21 @@ function save {
     elif [[ -n $2 ]]; then
         if [[ -d $2 ]]; then
             __overwrite $1
-            echo "$1|$2" >> $FILE
+            echo "$1|$2" >> $BOOKMARKS_FILE
             echo -e "${GREEN}bookmark for $2 saved as \"$1\"${RESET}"
         else
             echo -e "${RED}directory $2 does not exist${RESET}"
         fi
     else
         __overwrite $1
-        echo "$1|$PWD" >> $FILE
+        echo "$1|$PWD" >> $BOOKMARKS_FILE
         echo -e "${GREEN}bookmark for $PWD saved as \"$1\"${RESET}"
     fi
 }
 
 function jump {
     __help $1
-    local MARK=$(grep "^$1|" $FILE)
+    local MARK=$(grep "^$1|" $BOOKMARKS_FILE)
     if [[ -z $1 ]]; then
         echo -e "${RED}no bookmark name provided${RESET}"
     elif [[ -z $MARK ]]; then
@@ -62,7 +62,7 @@ function back {
 
 function del {
     __help $1
-    local MARK=$(grep "^$1|" $FILE)
+    local MARK=$(grep "^$1|" $BOOKMARKS_FILE)
     if [[ -z $1 ]]; then
         echo -ne "${YELLOW}this will delete bookmarks to nonexistent directories, continue?${RESET} "
         local REPLY; read REPLY
@@ -72,12 +72,12 @@ function del {
                 local NAME=$(echo "$LINE" | cut -d\| -f1)
                 local DIR=$(echo "$LINE" | cut -d\| -f2)
                 if [[ ! -d $DIR ]]; then
-                    \grep -v "$LINE" $FILE > $FILE.tmp
-                    \mv $FILE.tmp $FILE
+                    \grep -v "$LINE" $BOOKMARKS_FILE > $BOOKMARKS_FILE.tmp
+                    \mv $BOOKMARKS_FILE.tmp $BOOKMARKS_FILE
                     COUNT=$((COUNT + 1))
                     echo -e "${GRAY}> $NAME ($DIR)${RESET}"
                 fi
-            done < $FILE
+            done < $BOOKMARKS_FILE
             echo -e "${GREEN}deleted $COUNT broken bookmark(s)${RESET}"
         else
             kill -INT $$
@@ -85,16 +85,16 @@ function del {
     elif [[ -z $MARK ]]; then
         echo -e "${RED}bookmark \"$1\" does not exist${RESET}"
     else
-        \grep -v "^$1|" $FILE > $FILE.tmp
-        \mv $FILE.tmp $FILE
+        \grep -v "^$1|" $BOOKMARKS_FILE > $BOOKMARKS_FILE.tmp
+        \mv $BOOKMARKS_FILE.tmp $BOOKMARKS_FILE
         echo -e "${GREEN}deleted bookmark \"$1\"${RESET}"
     fi
 }
 
 function ren {
     __help $1
-    local OLD_MARK=$(grep "^$1|" $FILE)
-    local NEW_MARK=$(grep "^$2|" $FILE)
+    local OLD_MARK=$(grep "^$1|" $BOOKMARKS_FILE)
+    local NEW_MARK=$(grep "^$2|" $BOOKMARKS_FILE)
     if [[ -z $1 ]]; then
         echo -e "${RED}no bookmark name provided${RESET}"
     elif [[ -z $2 ]]; then
@@ -106,22 +106,22 @@ function ren {
     elif [[ -n $NEW_MARK ]]; then
         echo -e "${RED}boomark \"$2\" already exists${RESET}"
     else
-        sed -i "s|^$1\||$2\||g" $FILE
+        sed -i "s|^$1\||$2\||g" $BOOKMARKS_FILE
         echo -e "${GREEN}renamed \"$1\" to \"$2\"${RESET}"
     fi
 }
 
 function list {
     __help $1
-    local MARK=$(grep "^$1|" $FILE)
+    local MARK=$(grep "^$1|" $BOOKMARKS_FILE)
     if [[ -n $1 ]]; then
         if [[ -n $MARK ]]; then
             echo "$MARK" | cut -d\| -f2
         else
             echo -e "${RED}bookmark \"$1\" does not exist${RESET}"
         fi
-    elif [[ -s $FILE ]]; then
-        cat $FILE | sort | awk '{ printf "\033[1;34m%-18s\033[0m %s\n", $1, $2}' FS=\|
+    elif [[ -s $BOOKMARKS_FILE ]]; then
+        cat $BOOKMARKS_FILE | sort | awk '{ printf "\033[1;34m%-15s\033[0m %s\n", $1, $2}' FS=\|
     else
         echo -e "${YELLOW}no bookmarks saved${RESET}"
     fi
@@ -141,7 +141,7 @@ list ${GRAY}[name]${RESET}         list all bookmarks"
 }
 
 function __overwrite {
-    if grep -q "^$1|" $FILE; then
+    if grep -q "^$1|" $BOOKMARKS_FILE; then
         echo -ne "${RED}bookmark \"$1\" already exists, overwrite?${RESET} "
         local REPLY; read REPLY
         if [[ "${REPLY,,}" == "yes" || "${REPLY,,}" == "y" ]]; then
@@ -154,7 +154,7 @@ function __overwrite {
 
 function __autocomp {
     local CUR=${COMP_WORDS[COMP_CWORD]}
-    COMPREPLY=($(compgen -W '$(cut -d\| -f1 $FILE)' -- $CUR))
+    COMPREPLY=($(compgen -W '$(cut -d\| -f1 $BOOKMARKS_FILE)' -- $CUR))
     return 0
 }
 
